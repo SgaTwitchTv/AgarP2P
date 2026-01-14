@@ -28,6 +28,7 @@ namespace GameObjects
             var pos = new Vector2(body.Position.X * meterToPixel, body.Position.Y * meterToPixel);
             float radiusPx = _radius * meterToPixel;
             var origin = new Vector2(_texture.Width / 2f, _texture.Height / 2f);
+            var posPx = new Vector2(body.Position.X * meterToPixel, body.Position.Y * meterToPixel);
 
             spriteBatch.Draw(_texture, pos, null, Color.Green, 0f, origin, radiusPx / (_texture.Width / 2f), SpriteEffects.None, 0f);
         }

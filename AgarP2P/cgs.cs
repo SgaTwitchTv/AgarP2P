@@ -28,12 +28,16 @@ namespace AgarP2P
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            _graphics.PreferredBackBufferWidth = 1600;
+            _graphics.PreferredBackBufferHeight = 900;
+            _graphics.ApplyChanges();
         }
 
         protected override void Initialize()
         {
             _physicsWorld = new PhysicsWorld();
-            _camera = new Camera2D();
+            _camera = new Camera2D(_graphics);
 
             base.Initialize();
         }
@@ -44,8 +48,9 @@ namespace AgarP2P
             _circleTex = CreateCircleTexture(GraphicsDevice, 32, Color.White);
             _player = new Player(_physicsWorld.World, _circleTex, new Vector2(0f, 0f));
 
+            // Here we spawn initial pellets
             var random = new System.Random();
-            for(int i = 0; i < 20; i++)
+            for(int i = 0; i < 400; i++)
             {
                 float x = (float)(random.NextDouble() * 100 - 50);
                 float y = (float)(random.NextDouble() * 100 - 50);
@@ -57,7 +62,9 @@ namespace AgarP2P
         {
             // Exit game on ESC
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
                 Exit();
+            }
 
             // Update player input and movement
             _player.Update(gameTime);
@@ -74,7 +81,7 @@ namespace AgarP2P
                 float dx = pellet.body.Position.X - _player.body.Position.X;
                 float dy = pellet.body.Position.Y - _player.body.Position.Y;
                 float distSq = dx * dx + dy * dy;
-                float eatRadius = 0.7f; // player radius + pellet radius threshold
+                float eatRadius = _player.Radius; // player radius + pellet radius threshold
 
                 if (distSq < eatRadius * eatRadius)
                 {
@@ -91,9 +98,12 @@ namespace AgarP2P
             _nextPelletSpawnTime -= gameTime.ElapsedGameTime.TotalSeconds;
             if (_nextPelletSpawnTime <= 0)
             {
-                float x = (float)(_rand.NextDouble() * 100 - 50);
-                float y = (float)(_rand.NextDouble() * 100 - 50);
-                _pellets.Add(new Pellet(_physicsWorld.World, _circleTex, new Vector2(x, y)));
+                for (int i = 0; i < 10; i++) // spawn 5 pellets at a time
+                {
+                    float x = (float)(_rand.NextDouble() * 100 - 50);
+                    float y = (float)(_rand.NextDouble() * 100 - 50);
+                    _pellets.Add(new Pellet(_physicsWorld.World, _circleTex, new Vector2(x, y)));
+                }
 
                 _nextPelletSpawnTime = _rand.NextDouble() * 5.0; // schedule next spawn
             }
@@ -109,7 +119,7 @@ namespace AgarP2P
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _spriteBatch.Begin();
+            _spriteBatch.Begin(transformMatrix: _camera.GetTransform());
             var screenCenter = new Vector2(_graphics.PreferredBackBufferWidth / 2f, _graphics.PreferredBackBufferHeight / 2f);
 
             _player.Draw(_spriteBatch, MeterToPixel, screenCenter);
