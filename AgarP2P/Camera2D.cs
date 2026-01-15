@@ -27,7 +27,7 @@ namespace AgarP2P
 
         public void Follow(Vector2 target, float lerp = 0.1f)
         {
-            Position = target;
+            Position = Vector2.Lerp(Position, target, lerp); // Smooth camera
         }
 
         public void SetZoom(float zoom)

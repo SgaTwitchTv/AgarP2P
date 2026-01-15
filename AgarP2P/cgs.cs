@@ -74,6 +74,10 @@ namespace AgarP2P
                 _player.body.Position.X * MeterToPixel,
                 _player.body.Position.Y * MeterToPixel));
 
+            float baseZoom = 1.0f; // this keeps your current starting zoom
+            float targetZoom = baseZoom / (1f + (_player.Radius - 0.5f) * 0.8f);
+            _camera.SmoothZoom(targetZoom);
+
             // Handle pellet eating (player overlaps pellets)
             for (int i = _pellets.Count - 1; i >= 0; i--)
             {
